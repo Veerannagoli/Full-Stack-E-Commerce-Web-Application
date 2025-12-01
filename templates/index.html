@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>AllAge Store</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0 }
+        :root { --bg: #fbf9fb; --card: #ffffff; --muted: #6b6b6b; --accent: #ff6b8a; --accent-2: #ff9fb1; --shadow: 0 8px 24px rgba(16, 24, 40, 0.06); --radius: 12px; font-family: Inter, system-ui, Arial; }
+        body { background: var(--bg); color: #111; line-height: 1.45 }
+        .wrap { max-width: 1150px; margin: 26px auto; padding: 18px }
+        
+        /* Header */
+        header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+        .logo { width: 50px; height: 50px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); display: grid; place-items: center; color: white; font-weight: 800; font-size: 1.2rem; }
+        nav { display: flex; gap: 8px; align-items: center }
+        .nav-link { background: transparent; border: none; padding: 8px 12px; cursor: pointer; font-weight: 600; color: #444; border-radius: 8px; transition: 0.2s; }
+        .nav-link:hover { background: #eee; }
+        .nav-link.active { background: var(--card); box-shadow: var(--shadow); color: var(--accent); }
+        .icon-btn { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; font-size: 1.2rem; background: #fff; border: 1px solid #eee; transition: 0.2s; position: relative; }
+        .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .badge { position: absolute; top: -2px; right: -2px; background: var(--accent); color: white; font-size: 0.7rem; width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font-weight: bold; }
+        
+        /* Products */
+        .products { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-top: 20px; }
+        .product { background: white; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); transition: transform 0.2s; cursor: pointer; position: relative; }
+        .product:hover { transform: translateY(-4px); }
+        .thumb { height: 240px; background: #f4f4f4; overflow: hidden; }
+        .thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .heart-btn { position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; background: rgba(255,255,255,0.9); border-radius: 50%; display: grid; place-items: center; font-size: 1.2rem; cursor: pointer; z-index: 2; transition: 0.2s; color: #ccc; }
+        .heart-btn.loved { color: #ff4757; }
+        .info { padding: 14px; }
+        .price { font-weight: 800; color: var(--accent); font-size: 1.1rem; }
+        
+        /* Buttons */
+        .btn { padding: 8px 14px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
+        .btn.primary { background: var(--accent); color: white; }
+        .btn.ghost { background: transparent; border: 1px solid #ddd; }
+        
+        /* Modal */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(3px); }
+        .modal.show { display: flex; }
+        .box { background: white; padding: 24px; border-radius: 12px; max-width: 600px; width: 95%; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow); }
+        
+        /* Checkout & Forms */
+        .form-row { display: flex; gap: 12px; margin-bottom: 12px; }
+        .form-col { flex: 1; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
+        label { font-size: 0.85rem; color: #666; margin-bottom: 4px; display: block; font-weight: 600; }
+        
+        .addr-card { border: 1px solid #eee; padding: 15px; border-radius: 8px; background: #f9f9f9; margin-bottom: 15px; }
+        .pay-opt { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 8px; cursor: pointer; }
+        .pay-opt:hover { background: #f9f9f9; border-color: #ddd; }
+        .pay-opt.selected { border-color: var(--accent); background: #fff0f4; }
+        
+        .dash-tabs { display: flex; border-bottom: 1px solid #eee; margin-bottom: 16px; gap: 16px; }
+        .dash-tab { padding-bottom: 8px; cursor: pointer; border-bottom: 2px solid transparent; color: #666; }
+        .dash-tab.active { border-bottom-color: var(--accent); color: var(--accent); font-weight: bold; }
+        .dash-content { display: none; }
+        .dash-content.active { display: block; }
+        
+        .size-btn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid #ddd; display: grid; place-items: center; cursor: pointer; }
+        .size-btn.selected { background: var(--accent); color: white; border-color: var(--accent); }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <header>
+            <div style="display:flex;align-items:center;gap:12px">
+                <div class="logo">AA</div>
+                <div style="font-weight:800;font-size:1.1rem">AllAge Store</div>
+            </div>
+            <nav>
+                <button class="nav-link active" onclick="setSection('all')" id="nav-all">All</button>
+                <button class="nav-link" onclick="setSection('men')" id="nav-men">Men</button>
+                <button class="nav-link" onclick="setSection('women')" id="nav-women">Women</button>
+                <button class="nav-link" onclick="setSection('kids')" id="nav-kids">Kids</button>
+            </nav>
+            <div style="display:flex;gap:12px;align-items:center">
+                <div class="icon-btn" onclick="openProfile('tab-wishlist')" title="Wishlist">♥</div>
+                <div class="icon-btn" onclick="openCartModal()" title="Cart">🛒 <span id="cart-badge" class="badge" style="display:none">0</span></div>
+                <div id="auth-container"></div>
+            </div>
+        </header>
+
+        <section style="background:white;padding:24px;border-radius:12px;box-shadow:var(--shadow);display:flex;justify-content:space-between;align-items:center">
+            <div><h1>Shop Men, Women & Kids</h1><p style="color:var(--muted)">Latest collection with secure checkout.</p></div>
+            <div style="background:#fff0f4;padding:12px;border-radius:8px;color:var(--accent);font-weight:bold">Free Delivery > ₹2000</div>
+        </section>
+
+        <main>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin:20px 0 16px 0">
+                <h3 id="cat-title">All Products</h3>
+                <input id="search" placeholder="Search..." style="padding:8px;border:1px solid #ddd;border-radius:8px" oninput="renderProducts()">
+            </div>
+            <div id="products" class="products"></div>
+        </main>
+    </div>
+
+    <div id="modal" class="modal" onclick="if(event.target===this) closeModal()"><div id="modal-box" class="box"></div></div>
+
+    <script>
+        let state = { section: 'all', cart: JSON.parse(localStorage.getItem('aa_cart') || '{}'), wishlist: JSON.parse(localStorage.getItem('aa_wish') || '[]') };
+        let products = [];
+        let currentUser = JSON.parse(localStorage.getItem('aa_user') || 'null');
+        let selectedSize = null;
+        let checkoutData = { address: null, payment: 'Card' };
+
+        (async function init() {
+            const res = await fetch('/api/products?section=all'); products = await res.json();
+            renderAuth(); renderProducts(); updateCartBadge();
+        })();
+
+        // --- CORE UI ---
+        function setSection(sec) {
+            state.section = sec;
+            document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+            document.getElementById(`nav-${sec}`).classList.add('active');
+            document.getElementById('cat-title').innerText = sec === 'all' ? 'All Products' : sec.charAt(0).toUpperCase() + sec.slice(1);
+            renderProducts();
+        }
+
+        function renderProducts() {
+            const q = document.getElementById('search').value.toLowerCase();
+            const filtered = products.filter(p => (state.section === 'all' || p.section === state.section) && p.title.toLowerCase().includes(q));
+            document.getElementById('products').innerHTML = filtered.map(p => {
+                const isLoved = state.wishlist.includes(p.id);
+                return `
+                <div class="product">
+                    <div class="thumb" onclick="openProduct(${p.id})"><img src="${p.image}" loading="lazy"></div>
+                    <div class="heart-btn ${isLoved ? 'loved' : ''}" onclick="toggleWishlist(event, ${p.id})">♥</div>
+                    <div class="info" onclick="openProduct(${p.id})">
+                        <div style="font-weight:600">${p.title}</div>
+                        <div style="color:var(--muted);font-size:0.9rem">${p.desc}</div>
+                        <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center">
+                            <span class="price">₹${p.price}</span>
+                            <span style="font-size:0.8rem;color:var(--accent);font-weight:bold">View</span>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('') || '<div style="padding:20px;color:#777">No products found.</div>';
+        }
+
+        function toggleWishlist(e, id) { e.stopPropagation(); state.wishlist = state.wishlist.includes(id) ? state.wishlist.filter(x => x !== id) : [...state.wishlist, id]; localStorage.setItem('aa_wish', JSON.stringify(state.wishlist)); renderProducts(); }
+        function openProduct(id) {
+            const p = products.find(x => x.id === id); selectedSize = null;
+            openModal(`
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+                    <img src="${p.image}" style="width:100%;border-radius:8px">
+                    <div>
+                        <h2>${p.title}</h2><h3 class="price">₹${p.price}</h3><p style="color:#666;margin:10px 0">${p.desc}</p>
+                        <div style="margin:20px 0"><strong>Select Size:</strong><div class="size-row" style="display:flex;gap:8px">${['S','M','L','XL','XXL'].map(s => `<div class="size-btn" onclick="setSize(this, '${s}')">${s}</div>`).join('')}</div></div>
+                        <div style="display:flex;gap:10px"><button class="btn ghost" style="flex:1" onclick="addWithCheck(${p.id}, false)">Add to Cart</button><button class="btn primary" style="flex:1" onclick="addWithCheck(${p.id}, true)">Buy Now</button></div>
+                    </div>
+                </div>`);
+        }
+        function setSize(el, s) { document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected')); el.classList.add('selected'); selectedSize = s; }
+        function addWithCheck(id, buy) { if(!selectedSize) return alert('Select a size'); state.cart[id] = (state.cart[id] || 0) + 1; localStorage.setItem('aa_cart', JSON.stringify(state.cart)); updateCartBadge(); if(buy) { closeModal(); openCheckoutStep1(); } else { closeModal(); alert(`Added Size ${selectedSize} to Cart`); } }
+
+        // --- CART WITH IMAGES ---
+        function updateCartBadge() { const c = Object.keys(state.cart).length; document.getElementById('cart-badge').innerText = c; document.getElementById('cart-badge').style.display = c > 0 ? 'grid' : 'none'; }
+        function openCartModal() {
+            const ids = Object.keys(state.cart);
+            if(!ids.length) return openModal('<h3>Your Cart</h3><p style="padding:20px 0;color:#777">Cart is empty.</p><button class="btn ghost" onclick="closeModal()">Close</button>');
+            let total = 0;
+            const items = ids.map(id => {
+                const p = products.find(x => x.id == id); total += p.price * state.cart[id];
+                return `
+                <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #eee;align-items:center">
+                    <img src="${p.image}" style="width:50px;height:50px;object-fit:cover;border-radius:6px">
+                    <div style="flex:1"><b>${p.title}</b><br><span style="color:#666;font-size:0.9rem">Size ${selectedSize || 'M'} x ${state.cart[id]}</span></div>
+                    <div style="text-align:right">₹${p.price*state.cart[id]} <br> <span onclick="deleteItem(${id})" style="color:red;cursor:pointer;font-size:0.9rem">Remove</span></div>
+                </div>`;
+            }).join('');
+            openModal(`<h3>Your Cart</h3><div style="max-height:300px;overflow:auto">${items}</div><div style="display:flex;justify-content:space-between;font-weight:bold;margin-top:15px;font-size:1.1rem"><span>Total</span><span>₹${total}</span></div><div style="margin-top:20px;display:flex;gap:10px"><button class="btn ghost" onclick="state.cart={};localStorage.setItem('aa_cart','{}');updateCartBadge();closeModal()">Clear</button><button class="btn primary" style="flex:1" onclick="openCheckoutStep1()">Proceed to Checkout</button></div>`);
+        }
+        function deleteItem(id) { delete state.cart[id]; localStorage.setItem('aa_cart', JSON.stringify(state.cart)); updateCartBadge(); openCartModal(); }
+
+        // --- ADVANCED CHECKOUT ---
+        async function openCheckoutStep1() {
+            if(!Object.keys(state.cart).length) return alert('Cart empty');
+            if(!currentUser) return openLogin(); // Must login
+            
+            // Fetch Saved Address
+            const res = await fetch(`/api/user/profile?email=${currentUser.email}`);
+            const data = await res.json();
+            const savedAddr = data.address ? JSON.parse(data.address) : null;
+
+            if (savedAddr && !checkoutData.useNew) {
+                // Scenario: Saved Address Exists
+                checkoutData.address = savedAddr;
+                openModal(`
+                    <h3>Checkout (1/2): Shipping</h3>
+                    <div class="addr-card">
+                        <strong>${savedAddr.name}</strong><br>
+                        ${savedAddr.line1}<br>
+                        ${savedAddr.line2 ? savedAddr.line2 + '<br>' : ''}
+                        ${savedAddr.city}, ${savedAddr.state} - ${savedAddr.zip}<br>
+                        ${savedAddr.country}
+                    </div>
+                    <button class="btn primary" style="width:100%" onclick="openCheckoutStep2()">Deliver Here</button>
+                    <button class="btn ghost" style="width:100%;margin-top:8px" onclick="checkoutData.useNew=true;openCheckoutStep1()">Add New Address</button>
+                `);
+            } else {
+                // Scenario: New Address Form
+                openModal(`
+                    <h3>Checkout (1/2): Enter Address</h3>
+                    <div class="form-row"><div class="form-col"><label>Full Name</label><input id="addr-name" value="${currentUser.name}"></div></div>
+                    <div class="form-row"><div class="form-col"><label>Address Line 1</label><input id="addr-l1" placeholder="Street, P.O. Box"></div></div>
+                    <div class="form-row"><div class="form-col"><label>Address Line 2</label><input id="addr-l2" placeholder="Apartment, Suite (Optional)"></div></div>
+                    <div class="form-row"><div class="form-col"><label>City</label><input id="addr-city"></div><div class="form-col"><label>State</label><input id="addr-state"></div></div>
+                    <div class="form-row"><div class="form-col"><label>ZIP Code</label><input id="addr-zip"></div><div class="form-col"><label>Country</label><input id="addr-country" value="United States"></div></div>
+                    <div style="margin-bottom:15px"><input type="checkbox" id="save-addr" checked> <label for="save-addr" style="display:inline">Save this address</label></div>
+                    <div style="display:flex;gap:10px"><button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn primary" style="flex:1" onclick="saveAndProceed()">Next: Payment</button></div>
+                `);
+            }
+        }
+
+        async function saveAndProceed() {
+            const addrObj = {
+                name: document.getElementById('addr-name').value,
+                line1: document.getElementById('addr-l1').value,
+                line2: document.getElementById('addr-l2').value,
+                city: document.getElementById('addr-city').value,
+                state: document.getElementById('addr-state').value,
+                zip: document.getElementById('addr-zip').value,
+                country: document.getElementById('addr-country').value
+            };
+            if(!addrObj.name || !addrObj.line1 || !addrObj.city || !addrObj.zip) return alert('Please fill required fields');
+            
+            checkoutData.address = addrObj;
+            if(document.getElementById('save-addr').checked) {
+                await fetch('/api/user/profile', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email:currentUser.email, address:JSON.stringify(addrObj)})});
+            }
+            checkoutData.useNew = false; // Reset flag
+            openCheckoutStep2();
+        }
+
+        function openCheckoutStep2() {
+            openModal(`
+                <h3>Checkout (2/2): Payment</h3>
+                <p style="color:#666;margin-bottom:15px">Shipping to: ${checkoutData.address.city}, ${checkoutData.address.zip}</p>
+                <div class="pay-opt selected" onclick="selPay(this, 'Credit Card')">💳 Credit / Debit Card</div>
+                <div class="pay-opt" onclick="selPay(this, 'UPI')">📱 UPI / GPay / PhonePe</div>
+                <div class="pay-opt" onclick="selPay(this, 'COD')">💵 Cash on Delivery</div>
+                <div style="margin-top:20px;display:flex;gap:10px"><button class="btn ghost" onclick="openCheckoutStep1()">Back</button><button class="btn primary" style="flex:1" onclick="placeOrder()">Place Order</button></div>
+            `);
+        }
+        function selPay(el, m) { document.querySelectorAll('.pay-opt').forEach(x => x.classList.remove('selected')); el.classList.add('selected'); checkoutData.payment = m; }
+
+        async function placeOrder() {
+            const addrString = `${checkoutData.address.name}, ${checkoutData.address.line1}, ${checkoutData.address.city}, ${checkoutData.address.zip}`;
+            const res = await fetch('/api/orders', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({cart:state.cart, name:currentUser.name, email:currentUser.email, address:addrString, payment_method:checkoutData.payment})});
+            const data = await res.json();
+            if(res.ok) { state.cart={}; localStorage.setItem('aa_cart','{}'); updateCartBadge(); closeModal(); alert(`Order #${data.order_id} Placed!`); } else alert(data.error);
+        }
+
+        // --- AUTH & PROFILE ---
+        function renderAuth() { document.getElementById('auth-container').innerHTML = currentUser ? `<div class="icon-btn" onclick="openProfile('tab-account')" title="Profile">${currentUser.name.charAt(0)}</div>` : `<button class="btn primary" style="font-size:0.9rem" onclick="openLogin()">Login</button>`; }
+        
+        async function openProfile(activeTab) {
+            if(!currentUser) return openLogin();
+            const pRes = await fetch(`/api/user/profile?email=${currentUser.email}`); const profile = await pRes.json();
+            const oRes = await fetch(`/api/user/orders?email=${currentUser.email}`); const orders = await oRes.json();
+            
+            // Wishlist with Images
+            const wishHtml = state.wishlist.length ? state.wishlist.map(id => {
+                const p = products.find(x => x.id == id); return p ? `<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #eee"><img src="${p.image}" style="width:40px;height:40px;border-radius:4px;object-fit:cover"><span style="flex:1">${p.title}</span><button class="btn ghost" onclick="openProduct(${p.id})">View</button></div>` : '';
+            }).join('') : 'No items.';
+
+            // Formatted Address
+            let addrHtml = 'No Saved Address';
+            if(profile.address) {
+                const a = JSON.parse(profile.address);
+                addrHtml = `<div class="addr-card"><strong>${a.name}</strong><br>${a.line1}<br>${a.line2||''}<br>${a.city}, ${a.state} ${a.zip}<br>${a.country}</div>`;
+            }
+
+            openModal(`
+                <div style="display:flex;justify-content:space-between;margin-bottom:16px"><h3>Hi, ${profile.first_name}</h3><button class="btn ghost" onclick="logout()">Logout</button></div>
+                <div class="dash-tabs"><div class="dash-tab ${activeTab=='tab-wishlist'?'active':''}" onclick="tab('tab-wishlist')">Wishlist</div><div class="dash-tab ${activeTab=='tab-account'?'active':''}" onclick="tab('tab-account')">Account</div><div class="dash-tab ${activeTab=='tab-orders'?'active':''}" onclick="tab('tab-orders')">Orders</div></div>
+                <div id="tab-wishlist" class="dash-content ${activeTab=='tab-wishlist'?'active':''}">${wishHtml}</div>
+                <div id="tab-account" class="dash-content ${activeTab=='tab-account'?'active':''}"><p><strong>Email:</strong> ${profile.email}</p><h4>Saved Address</h4>${addrHtml}</div>
+                <div id="tab-orders" class="dash-content ${activeTab=='tab-orders'?'active':''}">${orders.map(o => `<div style="background:#f9f9f9;padding:10px;margin-bottom:8px;border-radius:8px"><b>Order #${o.id}</b> - ₹${o.total}<br><small>${o.date} via ${o.payment_method||'Card'}</small></div>`).join('') || 'No orders.'}</div>
+            `);
+        }
+        
+        function tab(id) { document.querySelectorAll('.dash-tab').forEach(x => x.classList.remove('active')); document.querySelectorAll('.dash-content').forEach(x => x.classList.remove('active')); event.target.classList.add('active'); document.getElementById(id).classList.add('active'); }
+        function logout() { localStorage.removeItem('aa_user'); currentUser = null; closeModal(); renderAuth(); }
+        
+        function openLogin() { openModal(`<h3>Login</h3><input id="le" placeholder="Email" style="width:100%;padding:10px;margin:10px 0"><input id="lp" type="password" placeholder="Password" style="width:100%;padding:10px;margin-bottom:10px"><button class="btn primary" style="width:100%" onclick="doLogin()">Login</button><p style="margin-top:10px;text-align:center;color:blue;cursor:pointer" onclick="openSignup()">Create Account</p>`); }
+        async function doLogin() { const res = await fetch('/api/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email:document.getElementById('le').value, password:document.getElementById('lp').value})}); const data = await res.json(); if(res.ok) { currentUser=data; localStorage.setItem('aa_user', JSON.stringify(data)); closeModal(); renderAuth(); } else alert(data.error); }
+        function openSignup() { openModal(`<h3>Sign Up</h3><input id="sf" placeholder="First Name" style="width:100%;padding:8px;margin:5px 0"><input id="sl" placeholder="Last Name" style="width:100%;padding:8px;margin:5px 0"><input id="sph" placeholder="Phone" style="width:100%;padding:8px;margin:5px 0"><input id="se" placeholder="Email" style="width:100%;padding:8px;margin:5px 0"><input id="sp" type="password" placeholder="Password" style="width:100%;padding:8px;margin:5px 0"><button class="btn primary" style="width:100%;margin-top:10px" onclick="doSignup()">Register</button>`); }
+        async function doSignup() { const body = {first_name:document.getElementById('sf').value, last_name:document.getElementById('sl').value, phone:document.getElementById('sph').value, email:document.getElementById('se').value, password:document.getElementById('sp').value, middle_name:''}; const res = await fetch('/api/signup', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)}); if(res.ok) { alert('Success'); openLogin(); } else alert('Error'); }
+
+        // --- UTILS ---
+        function openModal(html) { document.getElementById('modal-box').innerHTML = html; document.getElementById('modal').classList.add('show'); }
+        function closeModal() { document.getElementById('modal').classList.remove('show'); }
+    </script>
+</body>
+</html>
